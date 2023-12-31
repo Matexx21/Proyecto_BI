@@ -1,0 +1,197 @@
+-- Eliminamos restricciones de clave externa
+DO $$ 
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_contenido_paquete_contenido_paquete2_fk') THEN
+        ALTER TABLE CONTENIDO_PAQUETE DROP CONSTRAINT fk_contenido_paquete_contenido_paquete2_fk;
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_contenido_paquete_contenido_producto_fk') THEN
+        ALTER TABLE CONTENIDO_PAQUETE DROP CONSTRAINT fk_contenido_paquete_contenido_producto_fk;
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_orden_ent_ordenentr_paquete_fk') THEN
+        ALTER TABLE ORDEN_ENTREGA DROP CONSTRAINT fk_orden_ent_ordenentr_paquete_fk;
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_paquete_cliente_p_cliente_fk') THEN
+        ALTER TABLE PAQUETE DROP CONSTRAINT fk_paquete_cliente_p_cliente_fk;
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_paquete_paquete_c_ciudad_fk') THEN
+        ALTER TABLE PAQUETE DROP CONSTRAINT fk_paquete_paquete_c_ciudad_fk;
+    END IF;
+END $$;
+
+-- Eliminamos índices y tablas
+DROP INDEX IF EXISTS contenido_paquete_fk;
+DROP INDEX IF EXISTS contenido_paquete2_fk;
+DROP INDEX IF EXISTS contenido_paquete_pk;
+DROP TABLE IF EXISTS CONTENIDO_PAQUETE;
+
+DROP INDEX IF EXISTS orden_entrega_paquete_fk;
+DROP INDEX IF EXISTS orden_entrega_pk;
+DROP TABLE IF EXISTS ORDEN_ENTREGA;
+
+DROP INDEX IF EXISTS paquete_ciudad_fk;
+DROP INDEX IF EXISTS cliente_paquete_fk;
+DROP INDEX IF EXISTS paquete_pk;
+DROP TABLE IF EXISTS PAQUETE;
+
+DROP INDEX IF EXISTS ciudad_pk;
+DROP TABLE IF EXISTS CIUDAD;
+
+DROP INDEX IF EXISTS cliente_pk;
+DROP TABLE IF EXISTS CLIENTE;
+
+DROP INDEX IF EXISTS producto_pk;
+DROP TABLE IF EXISTS PRODUCTO;
+
+-- Creamos la tabla CIUDAD
+CREATE TABLE CIUDAD 
+(
+   CODIGO_CIUDAD        CHAR(10)                       NOT NULL,
+   NOMBRE_CIUDAD        VARCHAR(50)                    NOT NULL,
+   PROVINCIA            VARCHAR(50)                    NOT NULL,
+   CONSTRAINT PK_CIUDAD PRIMARY KEY (CODIGO_CIUDAD)
+);
+
+-- Creamos índice único para CIUDAD
+CREATE UNIQUE INDEX CIUDAD_PK ON CIUDAD (CODIGO_CIUDAD);
+
+-- Creamos la tabla CLIENTE
+CREATE TABLE CLIENTE 
+(
+   CEDULA               CHAR(10)                       NOT NULL,
+   NOMBRE_CLIENTE       VARCHAR(50)                    NOT NULL,
+   APELLIDO_CLIENTE     VARCHAR(50)                    NOT NULL,
+   EDAD                 INTEGER                        NOT NULL,
+   DIRECCION            VARCHAR(100)                   NOT NULL,
+   TELEFONO             VARCHAR(15)                    NOT NULL,
+   SEXO                 VARCHAR(10)                    NOT NULL,
+   CONSTRAINT PK_CLIENTE PRIMARY KEY (CEDULA)
+);
+
+-- Creamos índice único para CLIENTE
+CREATE UNIQUE INDEX CLIENTE_PK ON CLIENTE (CEDULA);
+
+-- Creamos la tabla CONTENIDO_PAQUETE
+CREATE TABLE CONTENIDO_PAQUETE 
+(
+   CODIGO_PAQUETE2      CHAR(10)                       NOT NULL,
+   CODIGO_PRODUCTO      CHAR(10)                       NOT NULL,
+   CANTIDAD_PRODUCTO_PAQUETE INTEGER                        NOT NULL,
+   PRECIO_PRODUCTO_PAQUETE NUMERIC(5,2)                   NOT NULL,
+   CONSTRAINT PK_CONTENIDO_PAQUETE PRIMARY KEY (CODIGO_PAQUETE2, CODIGO_PRODUCTO)
+);
+
+-- Creamos índices para CONTENIDO_PAQUETE
+CREATE UNIQUE INDEX CONTENIDO_PAQUETE_PK ON CONTENIDO_PAQUETE (CODIGO_PAQUETE2, CODIGO_PRODUCTO);
+CREATE INDEX CONTENIDO_PAQUETE2_FK ON CONTENIDO_PAQUETE (CODIGO_PRODUCTO);
+CREATE INDEX CONTENIDO_PAQUETE_FK ON CONTENIDO_PAQUETE (CODIGO_PAQUETE2);
+
+-- Creamos la tabla ORDEN_ENTREGA
+CREATE TABLE ORDEN_ENTREGA 
+(
+   CODIGO_ENTREGA       CHAR(10)                       NOT NULL,
+   CODIGO_PAQUETE2      CHAR(10)                       NOT NULL,
+   FECHA_ENVIO          DATE                           NOT NULL,
+   COSTO_ENVIO          NUMERIC(5,2)                   NOT NULL,
+   PRECIO_TOTAL         NUMERIC(6,2)                   NOT NULL,
+   CONSTRAINT PK_ORDEN_ENTREGA PRIMARY KEY (CODIGO_ENTREGA)
+);
+
+-- Creamos índices para ORDEN_ENTREGA
+CREATE UNIQUE INDEX ORDEN_ENTREGA_PK ON ORDEN_ENTREGA (CODIGO_ENTREGA);
+CREATE INDEX ORDENENTREGA_PAQUETE_FK ON ORDEN_ENTREGA (CODIGO_PAQUETE2);
+
+-- Creamos la tabla PAQUETE
+CREATE TABLE PAQUETE 
+(
+   CODIGO_PAQUETE2      CHAR(10)                       NOT NULL,
+   CEDULA               CHAR(10)                       NOT NULL,
+   CODIGO_CIUDAD        CHAR(10)                       NOT NULL,
+   PESO                 FLOAT(5)                       NOT NULL,
+   DESCRIPCION          VARCHAR(50)                    NOT NULL,
+   ESTADO_PAQUETE       VARCHAR(40)                    NOT NULL,
+   CONSTRAINT PK_PAQUETE PRIMARY KEY (CODIGO_PAQUETE2)
+);
+
+-- Creamos índices para PAQUETE
+CREATE UNIQUE INDEX PAQUETE_PK ON PAQUETE (CODIGO_PAQUETE2);
+CREATE INDEX CLIENTE_PAQUETE_FK ON PAQUETE (CEDULA);
+CREATE INDEX PAQUETE_CIUDAD_FK ON PAQUETE (CODIGO_CIUDAD);
+
+-- Creamos la tabla PRODUCTO
+CREATE TABLE PRODUCTO 
+(
+   CODIGO_PRODUCTO      CHAR(10)                       NOT NULL,
+   NOMBRE_PRODUCTO      VARCHAR(50)                    NOT NULL,
+   CANTIDAD_PRODUCTO    SMALLINT                       NOT NULL,
+   PRECIO_UNITARIO      NUMERIC(5,2)                   NOT NULL,
+   CONSTRAINT PK_PRODUCTO PRIMARY KEY (CODIGO_PRODUCTO)
+);
+
+-- Creamos índice único para PRODUCTO
+CREATE UNIQUE INDEX PRODUCTO_PK ON PRODUCTO (CODIGO_PRODUCTO);
+
+-- Añadimos las restricciones de clave externa
+ALTER TABLE CONTENIDO_PAQUETE
+   ADD CONSTRAINT fk_contenido_paquete_contenido_paquete2_fk
+   FOREIGN KEY (CODIGO_PAQUETE2)
+   REFERENCES PAQUETE (CODIGO_PAQUETE2)
+   ON UPDATE RESTRICT
+   ON DELETE RESTRICT;
+
+ALTER TABLE CONTENIDO_PAQUETE
+   ADD CONSTRAINT fk_contenido_paquete_contenido_producto_fk
+   FOREIGN KEY (CODIGO_PRODUCTO)
+   REFERENCES PRODUCTO (CODIGO_PRODUCTO)
+   ON UPDATE RESTRICT
+   ON DELETE RESTRICT;
+
+ALTER TABLE ORDEN_ENTREGA
+   ADD CONSTRAINT fk_orden_ent_ordenentr_paquete_fk
+   FOREIGN KEY (CODIGO_PAQUETE2)
+   REFERENCES PAQUETE (CODIGO_PAQUETE2)
+   ON UPDATE RESTRICT
+   ON DELETE RESTRICT;
+
+ALTER TABLE PAQUETE
+   ADD CONSTRAINT fk_paquete_cliente_p_cliente_fk
+   FOREIGN KEY (CEDULA)
+   REFERENCES CLIENTE (CEDULA)
+   ON UPDATE RESTRICT
+   ON DELETE RESTRICT;
+
+ALTER TABLE PAQUETE
+   ADD CONSTRAINT fk_paquete_paquete_c_ciudad_fk
+   FOREIGN KEY (CODIGO_CIUDAD)
+   REFERENCES CIUDAD (CODIGO_CIUDAD)
+   ON UPDATE RESTRICT
+   ON DELETE RESTRICT;
+
+
+-- Eliminar la función y el trigger antiguos
+DROP FUNCTION IF EXISTS calcular_precio_total() CASCADE;
+DROP TRIGGER IF EXISTS calcular_precio_total_trigger ON ORDEN_ENTREGA;
+
+-- Crear la nueva función y trigger
+CREATE OR REPLACE FUNCTION calcular_precio_total()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Calcular la suma de precios totales para todos los productos en el paquete
+    NEW.PRECIO_TOTAL := (
+        SELECT COALESCE(SUM(cp.CANTIDAD_PRODUCTO_PAQUETE * cp.PRECIO_PRODUCTO_PAQUETE), 0)
+        FROM CONTENIDO_PAQUETE cp
+        WHERE cp.CODIGO_PAQUETE2 = NEW.CODIGO_PAQUETE2
+    );
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Crear el nuevo trigger
+CREATE TRIGGER calcular_precio_total_trigger
+BEFORE INSERT OR UPDATE ON ORDEN_ENTREGA
+FOR EACH ROW
+EXECUTE FUNCTION calcular_precio_total();

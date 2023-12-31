@@ -1,0 +1,53 @@
+-- Inserción de datos en CIUDAD
+INSERT INTO CIUDAD (CODIGO_CIUDAD, NOMBRE_CIUDAD, PROVINCIA)
+VALUES
+    ('C1', 'Quito', 'Pichincha'),
+    ('C2', 'Guayaquil', 'Guayas'),
+    ('C3', 'Cuenca', 'Azuay'),
+    ('C4', 'Ambato', 'Tungurahua'),
+    ('C5', 'Manta', 'Manabí');
+
+-- Inserción de datos en CLIENTE
+INSERT INTO CLIENTE (CEDULA, NOMBRE_CLIENTE, APELLIDO_CLIENTE, EDAD, DIRECCION, TELEFONO, SEXO)
+VALUES
+    ('1001', 'Juan', 'Perez', 30, 'Calle 123, Quito', '0991234567', 'Masculino'),
+    ('1002', 'Ana', 'Gomez', 25, 'Av. Principal, Guayaquil', '0987654321', 'Femenino'),
+    ('1003', 'Carlos', 'Vera', 35, 'Av. 10 de Agosto, Cuenca', '0978901234', 'Masculino'),
+    ('1004', 'Maria', 'Lopez', 28, 'Av. Bolivar, Ambato', '0965432109', 'Femenino'),
+    ('1005', 'Pedro', 'Castro', 40, 'Malecón, Manta', '0954321098', 'Otro');
+
+-- Inserción de datos en PRODUCTO
+INSERT INTO PRODUCTO (CODIGO_PRODUCTO, NOMBRE_PRODUCTO, CANTIDAD_PRODUCTO, PRECIO_UNITARIO)
+VALUES
+('P1', 'Libreta Ejecutiva Oxford', 100, 10.99),
+('P2', 'Caja de Chocolates Ferrero Rocher', 100, 25.50),
+('P3', 'Teléfono Inteligente Samsung Galaxy', 50, 170.99),
+('P4', 'Juego de Tazas de Café de Cerámica', 120, 8.99),
+('P5', 'Set de Herramientas Black & Decker', 200, 5.50);
+
+-- Inserción de datos en PAQUETE
+INSERT INTO PAQUETE (CODIGO_PAQUETE2, CEDULA, CODIGO_CIUDAD, PESO, DESCRIPCION, ESTADO_PAQUETE)
+VALUES
+    ('PAQ1', '1001', 'C1', 8.5, 'Electrónicos', 'En tránsito'),
+    ('PAQ2', '1002', 'C2', 15.2, 'Electrodomésticos', 'Entregado'),
+    ('PAQ3', '1003', 'C3', 5.0, 'Ropa y accesorios', 'En tránsito'),
+    ('PAQ4', '1004', 'C4', 10.0, 'Libros', 'En tránsito'),
+    ('PAQ5', '1005', 'C5', 12.5, 'Juguetes', 'Entregado');
+
+-- Inserción de datos en CONTENIDO_PAQUETE
+INSERT INTO CONTENIDO_PAQUETE (CODIGO_PAQUETE2, CODIGO_PRODUCTO, CANTIDAD_PRODUCTO_PAQUETE, PRECIO_PRODUCTO_PAQUETE)
+VALUES
+    ('PAQ1', 'P1', 2, 10.99),
+    ('PAQ2', 'P2', 3, 25.50),
+    ('PAQ3', 'P3', 1, 170.99),
+    ('PAQ4', 'P4', 4, 8.99),
+    ('PAQ5', 'P5', 5, 5.50);
+
+-- Inserción de datos en ORDEN_ENTREGA
+INSERT INTO ORDEN_ENTREGA (CODIGO_ENTREGA, CODIGO_PAQUETE2, FECHA_ENVIO, COSTO_ENVIO, PRECIO_TOTAL)
+VALUES
+    ('OE1', 'PAQ1', '2023-01-15', 50.00, 0),
+    ('OE2', 'PAQ2', '2023-02-20', 30.00, 0),
+    ('OE3', 'PAQ3', '2023-03-10', 20.00, 0),
+    ('OE4', 'PAQ4', '2023-04-05', 40.00, 0),
+    ('OE5', 'PAQ5', '2023-05-12', 25.00, 0);
